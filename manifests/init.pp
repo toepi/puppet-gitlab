@@ -563,6 +563,7 @@ class gitlab(
     $gitlab_branch            = $gitlab::params::gitlab_branch,
     $gitlab_workhorse_sources = $gitlab::params::gitlab_workhorse_sources,
     $gitlab_workhorse_branch  = $gitlab::params::gitlab_workhorse_branch,
+    $gitlab_workhorse_port    = undef,
     $gitlabshell_branch       = $gitlab::params::gitlabshell_branch,
     $gitlabshell_sources      = $gitlab::params::gitlabshell_sources,
     $gitlabshell_log_folder   = $gitlab::params::gitlabshell_log_folder,
