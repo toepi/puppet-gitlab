@@ -94,8 +94,7 @@ class gitlab::install inherits gitlab {
   exec { 'install gitlab':
     command     => "bundle install${gitlab_bundler_jobs_flag} --without development aws test ${gitlab_without_gems} ${gitlab_with_gems} ${gitlab_bundler_flags}",
     cwd         => "${git_home}/gitlab",
-    subscribe   => Vcsrepo["${git_home}/gitlab"],
-    refreshonly => true,
+    unless      => 'bundle check',
     timeout     => 0,
     require     => [
       Gitlab::Config::Database['gitlab'],
