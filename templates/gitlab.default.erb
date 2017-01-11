@@ -33,6 +33,9 @@ web_server_pid_path="$pid_path/unicorn.pid"
 # The default is "$pid_path/sidekiq.pid"
 sidekiq_pid_path="$pid_path/sidekiq.pid"
 
+# gitlab 8.6
+gitlab_workhorse_dir=$(cd $app_root/../gitlab-workhorse 2> /dev/null && pwd)
+gitlab_workhorse_log="$app_root/log/gitlab-workhorse.log"
 gitlab_workhorse_pid_path="$pid_path/gitlab-workhorse.pid"
 # The -listenXxx settings determine where gitlab-workhorse
 # listens for connections from NGINX. To listen on localhost:8181, write
