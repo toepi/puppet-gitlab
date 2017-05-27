@@ -132,7 +132,7 @@ describe 'gitlab' do
     #### Db and devel packages
     describe 'packages' do
       #= On each distro
-      ['Debian','RedHat'].each do |distro|
+      ['Debian'].each do |distro|
         #= With each dbtype
         ['mysql','pgsql'].each do |dbtype|
           ['6', '7'].each do |majrelease|
