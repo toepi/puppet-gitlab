@@ -34,13 +34,13 @@ describe 'gitlab::ci' do
           :group  => 'root',
           :mode   => '0644'
         )}
-        it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*server unix:\/home\/gitlab_ci\/gitlab-ci\/tmp\/sockets\/gitlab-ci.socket;$/)}
-        it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*listen 80;$/)}
-        it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*server_name gitlab-ci.fooboozoo.fr;$/)}
-        it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*server_tokens off;$/)}
+        it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*server unix:\/home\/gitlab_ci\/gitlab-ci\/tmp\/sockets\/gitlab-ci.socket fail_timeout=0;$/)}
+        it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*listen 0.0.0.0:80;$/)}
+        it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*server_name gitlab-ci.fooboozoo.fr;(\s+#.*)?$/)}
+          it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*server_tokens off;(\s+#.*)?$/)}
         it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*root \/home\/gitlab_ci\/gitlab-ci\/public;$/)}
-        it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*proxy_read_timeout 60;$/)}
-        it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*proxy_connect_timeout 60;$/)}
+        it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*proxy_read_timeout\s+60;$/)}
+        it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*proxy_connect_timeout\s+60;$/)}
       end # nginx config
       describe 'gitlab init' do
         it { is_expected.to contain_file('/etc/init.d/gitlab_ci').with(
@@ -69,35 +69,35 @@ describe 'gitlab::ci' do
           :group  => 'root',
           :mode   => '0644'
         )}
-        it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*server unix:#{params_set[:ci_home]}\/gitlab-ci\/tmp\/sockets\/gitlab-ci.socket;$/)}
-        it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*server_name gitlab-ci.fooboozoo.fr;$/)}
-        it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*server_tokens off;$/)}
+        it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*server unix:#{params_set[:ci_home]}\/gitlab-ci\/tmp\/sockets\/gitlab-ci.socket fail_timeout=0;$/)}
+        it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*server_name gitlab-ci.fooboozoo.fr;(\s+#.*)?$/)}
+          it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*server_tokens off;(\s+#.*)?$/)}
         it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*root #{params_set[:ci_home]}\/gitlab-ci\/public;$/)}
-        it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*proxy_read_timeout #{params_set[:gitlab_http_timeout]};$/)}
-        it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*proxy_connect_timeout #{params_set[:gitlab_http_timeout]};$/)}
+        it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*proxy_read_timeout\s+#{params_set[:gitlab_http_timeout]};$/)}
+        it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*proxy_connect_timeout\s+#{params_set[:gitlab_http_timeout]};$/)}
         ["hostname1", "hostname1 hostname2.example.com hostname3.example.org"].each do |domain_alias|
           context "with domain_alias => #{domain_alias}" do
             let(:params) { params_set.merge(:gitlab_domain_alias => domain_alias)}
-            it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*server_name gitlab-ci.fooboozoo.fr #{domain_alias};$/)}
+            it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*server_name gitlab-ci.fooboozoo.fr #{domain_alias};(\s+#.*)?$/)}
           end
         end
         context 'with ssl' do
           let(:params) { params_set.merge(params_ssl) }
-          it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*listen 443;$/)}
-          it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*ssl_certificate               \/etc\/ssl\/certs\/ssl-cert-snakeoil.pem;$/)}
-          it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*ssl_certificate_key           \/etc\/ssl\/private\/ssl-cert-snakeoil.key;$/)}
-          it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*proxy_set_header   X-Forwarded-Ssl   on;$/)}
+          it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*listen 0.0.0.0:443 ssl;$/)}
+          it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*ssl_certificate\s+\/etc\/ssl\/certs\/ssl-cert-snakeoil.pem;$/)}
+          it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*ssl_certificate_key\s+\/etc\/ssl\/private\/ssl-cert-snakeoil.key;$/)}
+          it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*proxy_set_header\s+X-Forwarded-Ssl\s+on;$/)}
         end
         ["hostname1", "hostname1 hostname2.example.com hostname3.example.org"].each do |domain_alias|
           context "with ssl and domain_alias => #{domain_alias}" do
             let(:params) { params_set.merge(:gitlab_domain_alias => domain_alias)}
-            it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*server_name gitlab-ci.fooboozoo.fr #{domain_alias};$/)}
+            it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*server_name gitlab-ci.fooboozoo.fr #{domain_alias};(\s+#.*)?$/)}
           end
         end
         context 'with ssl and custom certs' do
           let(:params) { params_set.merge(params_ssl.merge({:gitlab_ssl_cert => '/srv/ssl/gitlab.pem',:gitlab_ssl_key => '/srv/ssl/gitlab.key'})) }
-            it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*ssl_certificate               \/srv\/ssl\/gitlab.pem;$/)}
-            it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*ssl_certificate_key           \/srv\/ssl\/gitlab.key;$/)}
+            it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*ssl_certificate\s+\/srv\/ssl\/gitlab.pem;$/)}
+            it { is_expected.to contain_file('/etc/nginx/conf.d/gitlab-ci.conf').with_content(/^\s*ssl_certificate_key\s+\/srv\/ssl\/gitlab.key;$/)}
         end
       end # nginx config
       describe 'gitlab init' do
